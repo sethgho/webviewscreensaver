@@ -50,6 +50,7 @@ static NSTimeInterval const kOneMinute = 60.0;
   BOOL _isPreview;
 }
 
+
 + (BOOL)performGammaFade {
   return YES;
 }
@@ -58,7 +59,6 @@ static NSTimeInterval const kOneMinute = 60.0;
   NSUserDefaults *prefs = [ScreenSaverDefaults defaultsForModuleWithName:kScreenSaverName];
   return [self initWithFrame:frame isPreview:isPreview prefsStore:prefs];
 }
-
 
 - (id)initWithFrame:(NSRect)frame isPreview:(BOOL)isPreview prefsStore:(NSUserDefaults *)prefs {
   self = [super initWithFrame:frame isPreview:isPreview];
@@ -147,15 +147,21 @@ static NSTimeInterval const kOneMinute = 60.0;
   }
 
   [self loadURLThing:url];
-  [_timer invalidate];
-  _timer = [NSTimer scheduledTimerWithTimeInterval:duration
-                                            target:self
-                                          selector:@selector(loadNext:)
-                                          userInfo:nil
-                                           repeats:NO];
+  [self scheduleNext:duration];
+}
+
+- (void)scheduleNext:(NSTimeInterval) duration {
+    [_timer invalidate];
+    NSLog(@"Loading URL. Next will be loaded in %f seconds", duration);
+    _timer = [NSTimer scheduledTimerWithTimeInterval:duration
+                                              target:self
+                                            selector:@selector(loadNext:)
+                                            userInfo:nil
+                                             repeats:NO];
 }
 
 - (void)loadNext:(NSTimer *)timer {
+  NSLog(@"Loaading next URL");
   NSTimeInterval duration = [WVSSAddress defaultDuration];
   NSString *url = [WVSSAddress defaultAddressURL];
   NSInteger nextIndex = _currentIndex;
@@ -172,12 +178,7 @@ static NSTimeInterval const kOneMinute = 60.0;
     url = [self urlForIndex:nextIndex];
   }
   [self loadURLThing:url];
-  [_timer invalidate];
-  _timer = [NSTimer scheduledTimerWithTimeInterval:duration
-                                            target:self
-                                          selector:@selector(loadNext:)
-                                          userInfo:nil
-                                           repeats:NO];
+  [self scheduleNext:duration];
   _currentIndex = nextIndex;
 }
 
@@ -195,7 +196,6 @@ static NSTimeInterval const kOneMinute = 60.0;
 - (NSArray *)selectedURLs {
   return self.configController.addresses;
 }
-
 
 - (NSString *)urlForIndex:(NSInteger)index {
   WVSSAddress *address = [self.configController.addresses objectAtIndex:index];
