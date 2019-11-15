@@ -20,6 +20,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "WVSSAddress.h"
 
 @protocol WVSSAddressListFetcherDelegate;
 

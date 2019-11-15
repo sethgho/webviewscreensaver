@@ -114,7 +114,7 @@ NS_ENUM(NSInteger, WVSSColumn) {
 }
 
 - (void)addressListFetcher:(WVSSAddressListFetcher *)fetcher
-        didFinishWithArray:(NSArray *)response {
+        didFinishWithArray:(NSArray<WVSSAddress*> *)response {
   [self.config.addresses removeAllObjects];
   [self.config.addresses addObjectsFromArray:response];
   [self.urlTable reloadData];
