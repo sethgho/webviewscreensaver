@@ -94,7 +94,6 @@ NS_ENUM(NSInteger, WVSSColumn) {
 
 #pragma mark - Actions
 
-
 - (IBAction)addRow:(id)sender {
   [self appendAddress];
 }
@@ -171,13 +170,10 @@ NS_ENUM(NSInteger, WVSSColumn) {
   return self.sheet;
 }
 
-
 - (IBAction)dismissConfigSheet:(id)sender {
   [self synchronize];
   [self.delegate configController:self dismissConfigSheet:self.sheet];
 }
-
-
 
 #pragma mark NSTableView
 
@@ -246,12 +242,10 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   if (dragRow < row) {
     [addresses insertObject:draggedObject atIndex:row];
     [addresses removeObjectAtIndex:dragRow];
-    //[self.urlList noteNumberOfRowsChanged];
     [self.urlTable reloadData];
   } else {
     [addresses removeObjectAtIndex:dragRow];
     [addresses insertObject:draggedObject atIndex:row];
-    //[self.urlList noteNumberOfRowsChanged];
     [self.urlTable reloadData];
   }
   return YES;
@@ -265,14 +259,22 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
 
   if (col == kWVSSColumnURL) {
     WVSSAddress *address = [self.config.addresses objectAtIndex:row];
-    address.url = textField.stringValue;
+    address.url = [self sanitizeUrl:textField.stringValue];
   } else if (col == kWVSSColumnDuration) {
     WVSSAddress *address = [self.config.addresses objectAtIndex:row];
     address.duration = [textField.stringValue intValue];
   }
-  // I don't think we need to reload the table.
-  //    [self.urlTable reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row]
-  //                             columnIndexes:[NSIndexSet indexSetWithIndex:col]];
+  // We need to reload the table because we've potentially modified the user inputs via sanitization.
+  [self.urlTable reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row]
+                           columnIndexes:[NSIndexSet indexSetWithIndex:col]];
+}
+
+- (NSString*)sanitizeUrl:(NSString*) url {
+    NSString *workingInput = [url stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+    if(![workingInput hasPrefix:@"http://"] && ![workingInput hasPrefix:@"https://"]) {
+        workingInput = [NSString stringWithFormat:@"http://%@", workingInput];
+    }
+    return workingInput;
 }
 
 
@@ -280,7 +282,7 @@ writeRowsWithIndexes:(NSIndexSet *)rowIndexes
   BOOL currentValue = self.config.shouldFetchAddressList;
   self.config.shouldFetchAddressList = !currentValue;
   [self.fetchURLCheckbox setIntegerValue:self.config.shouldFetchAddressList];
-  [self.urlsURLField setEnabled:self.config.shouldFetchAddressList];
+    [self.urlsURLField setEnabled:self.config.shouldFetchAddressList];
 }
 
 
