@@ -30,7 +30,7 @@ static NSString * const kScreenSaverURLListKey = @"kScreenSaverURLList";  // NSA
 
 @interface WVSSConfig ()
 @property(nonatomic, strong) NSUserDefaults *userDefaults;
-@property(nonatomic, strong) NSMutableArray *addresses;
+@property(nonatomic, strong) NSMutableArray<WVSSAddress*> *addresses;
 @end
 
 @implementation WVSSConfig
@@ -53,9 +53,9 @@ static NSString * const kScreenSaverURLListKey = @"kScreenSaverURLList";  // NSA
   return self;
 }
 
-- (NSMutableArray *)loadAddressesFromUserDefaults:(NSUserDefaults *)userDefaults {
+- (NSMutableArray<WVSSAddress*> *)loadAddressesFromUserDefaults:(NSUserDefaults *)userDefaults {
   NSArray *addressesFromUserDefaults = [[userDefaults arrayForKey:kScreenSaverURLListKey] mutableCopy];
-  NSMutableArray *addresses = [NSMutableArray array];
+  NSMutableArray<WVSSAddress*> *addresses = [NSMutableArray array];
   for (NSDictionary *addressDictionary in addressesFromUserDefaults) {
 
     NSString *url = addressDictionary[kWVSSAddressURLKey];
@@ -81,11 +81,11 @@ static NSString * const kScreenSaverURLListKey = @"kScreenSaverURLList";  // NSA
 - (void)synchronize {
   [self saveAddressesToUserDefaults:self.userDefaults];
   [self.userDefaults setBool:self.shouldFetchAddressList forKey:kScreenSaverFetchURLsKey];
-
+    
   if (self.addressListURL.length) {
     [self.userDefaults setObject:self.addressListURL forKey:kScreenSaverURLsURLKey];
   } else {
-    [self.userDefaults removeObjectForKey:kScreenSaverURLsURLKey];
+      [self.userDefaults removeObjectForKey:kScreenSaverURLsURLKey];
   }
   [self.userDefaults synchronize];
 

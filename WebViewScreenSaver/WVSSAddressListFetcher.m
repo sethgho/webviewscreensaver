@@ -20,6 +20,7 @@
 //
 
 #import "WVSSAddressListFetcher.h"
+#import "WVSSAddress.h"
 
 @interface WVSSAddressListFetcher ()
 @property (nonatomic, strong) NSMutableData *receivedData;
@@ -73,7 +74,11 @@
     return;
   }
 
-  [self.delegate addressListFetcher:self didFinishWithArray:response];
+    NSMutableArray<WVSSAddress*> *responseAddresses = [NSMutableArray array];
+    for(NSString *addressResponse in (NSArray*)response) {
+        [responseAddresses addObject:[WVSSAddress addressWithURL:addressResponse duration:300]];
+    }
+  [self.delegate addressListFetcher:self didFinishWithArray:responseAddresses];
   self.connection = nil;
   NSLog(@"fetching URLS finished");
 }

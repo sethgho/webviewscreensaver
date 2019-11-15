@@ -25,7 +25,7 @@
 
 @interface WVSSConfig : NSObject
 
-@property(nonatomic, strong, readonly) NSMutableArray *addresses;
+@property(nonatomic, strong, readonly) NSMutableArray<WVSSAddress*> *addresses;
 @property(nonatomic, strong) NSString *addressListURL;
 @property(nonatomic, assign) BOOL shouldFetchAddressList;
 
